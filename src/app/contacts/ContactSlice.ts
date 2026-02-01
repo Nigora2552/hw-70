@@ -1,7 +1,6 @@
-import type {IContact, IContactMutation} from "../../types";
+import type {IContact, IContactAPI, IContactMutation} from "../../types";
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import axiosApi from "../../axiosApi.ts";
-import type {RootState} from "../store.ts";
 
 interface ContactSlice {
     contacts: IContact[] | null;
@@ -24,6 +23,17 @@ export const contactSlice = createSlice({
         }
     },
     extraReducers: (builder) => {
+        builder.addCase(fetchContact.pending, (state) => {
+            state.loading = true;
+            state.oneContact = null;
+        });
+        builder.addCase(fetchContact.fulfilled, (state, action) => {
+            state.loading = false;
+            state.contacts = action.payload;
+        });
+        builder.addCase(fetchContact.rejected, (state) => {
+            state.loading = false;
+        });
         builder.addCase(getOneContact.pending, (state) => {
             state.loading = true;
             state.oneContact = null;
@@ -58,10 +68,21 @@ export const contactSlice = createSlice({
     }
 });
 
+export const fetchContact = createAsyncThunk<IContact[], void>('contact/fetchContact',
+    async () => {
+        const response = await axiosApi.get<IContactAPI | null>(`contacts.json`);
+        const contacts = response.data;
 
-export const selectCreateContact = (state: RootState) => state.contacts.contacts;
-export const selectOnePerson = (state: RootState) => state.contacts.oneContact;
-export const isLoading = (state: RootState) => state.contacts.loading;
+        if (contacts) {
+            return Object.keys(contacts).map(key => {
+                return {
+                    ...contacts[key],
+                    id: key
+                }
+            });
+        }
+        return [];
+    });
 
 export const getOneContact = createAsyncThunk<IContactMutation | null, string>('contact/getOneContact',
     async (id) => {
@@ -69,9 +90,9 @@ export const getOneContact = createAsyncThunk<IContactMutation | null, string>('
         return response.data;
     });
 
-export const editContact = createAsyncThunk<void, {id: string; item: IContactMutation}>('contacts/editContact',
+export const editContact = createAsyncThunk<void, { id: string; item: IContactMutation }>('contacts/editContact',
     async ({id, item}) => {
-       await axiosApi.put<IContactMutation | null>(`contacts${id}.json`, item);
+        await axiosApi.put<IContactMutation | null>(`contacts${id}.json`, item);
     })
 
 export const createContact = createAsyncThunk<void, IContactMutation>('contact/createContact',
@@ -79,4 +100,6 @@ export const createContact = createAsyncThunk<void, IContactMutation>('contact/c
         await axiosApi.post('contacts.json', item);
     })
 
+
+export const {clearContact} = contactSlice.actions;
 export const contactsReducer = contactSlice.reducer;

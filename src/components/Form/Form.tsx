@@ -5,25 +5,31 @@ import type {IContactMutation} from "../../types";
 
 interface Props {
     addContact: (contact: IContactMutation) => void;
-    initialValues?: IContactMutation;
+    initialValues?: IContactMutation | null;
     isEdit?: boolean;
     loading?: boolean;
 }
 
-const Form: React.FC<Props> = ({isEdit=false,addContact,loading=false,initialValues={
-    name: '',
-    phone: '',
-    email: '',
-    photo: '',
-}}) => {
-    const [form, setForm] = useState<IContactMutation>(initialValues);
+const Form: React.FC<Props> = ({isEdit=false,addContact,loading=false,initialValues = null}) => {
+    const [form, setForm] = useState<IContactMutation>(initialValues || {
+        name: '',
+            phone: '',
+            email: '',
+            photo: '',
+    });
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        addContact({...form});
-
-        setForm(initialValues)
+        if(form.name.trim().length > 0 && form.phone.trim().length > 0 && form.email.trim().length > 0){
+            addContact({...form});
+        }
+        setForm( {
+            name: '',
+            phone: '',
+            email: '',
+            photo: '',
+        })
     }
 
     const OnFieldHandler = (e: ChangeEvent<HTMLInputElement>) => {

@@ -1,10 +1,11 @@
+import PersonCard from "../../components/PersonCard/PersonCard.tsx";
 
 
 const Home = () => {
     return (
-        <div>
-
-        </div>
+        <>
+            <PersonCard/>
+        </>
     );
 };
 
