@@ -13,9 +13,9 @@ interface Props {
 const Form: React.FC<Props> = ({isEdit=false,addContact,loading=false,initialValues = null}) => {
     const [form, setForm] = useState<IContactMutation>(initialValues || {
         name: '',
-            phone: '',
-            email: '',
-            photo: '',
+        phone: '',
+        email: '',
+        photo: '',
     });
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -93,6 +93,12 @@ const Form: React.FC<Props> = ({isEdit=false,addContact,loading=false,initialVal
                     />
                 </Grid>
             </Grid>
+            {form.photo && <>
+                <Grid sx={{display: 'flex', gap: '20px', marginBottom: '20px'}}>
+                    <span>Phot preview</span>
+                    <img src={form.photo} alt={form.name}/>
+                </Grid></>}
+
             <Grid container spacing={2}>
                 <Button type='submit' variant="contained">{isEdit ? 'Edit' : 'Save'} {loading && <CircularProgress/>}</Button>
                 <Button variant="contained" component={NavLink} to='/'>Back to contacts</Button>

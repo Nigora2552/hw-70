@@ -1,15 +1,17 @@
 import type {IContact, IContactAPI, IContactMutation} from "../../types";
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, type PayloadAction} from "@reduxjs/toolkit";
 import axiosApi from "../../axiosApi.ts";
 
 interface ContactSlice {
     contacts: IContact[] | null;
+    item: IContact | undefined;
     oneContact: IContactMutation | null;
     loading: boolean;
 }
 
 const initialState: ContactSlice = {
     contacts: [],
+    item:undefined,
     oneContact: null,
     loading: false,
 }
@@ -18,8 +20,12 @@ export const contactSlice = createSlice({
     name: 'contact',
     initialState,
     reducers: {
-        clearContact: (state) => {
-            state.oneContact = null;
+        getContact: (state, action:PayloadAction<IContact | undefined>) => {
+            const onePerson = action.payload;
+
+                if (onePerson) {
+                    state.item = onePerson
+            }
         }
     },
     extraReducers: (builder) => {
@@ -101,5 +107,5 @@ export const createContact = createAsyncThunk<void, IContactMutation>('contact/c
     })
 
 
-export const {clearContact} = contactSlice.actions;
+export const {getContact} = contactSlice.actions;
 export const contactsReducer = contactSlice.reducer;
