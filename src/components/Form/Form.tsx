@@ -17,7 +17,6 @@ const Form: React.FC<Props> = ({isEdit=false,addContact,loading=false,initialVal
         email: '',
         photo: '',
     });
-
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -100,7 +99,7 @@ const Form: React.FC<Props> = ({isEdit=false,addContact,loading=false,initialVal
                 </Grid></>}
 
             <Grid container spacing={2}>
-                <Button type='submit' variant="contained">{isEdit ? 'Edit' : 'Save'} {loading && <CircularProgress/>}</Button>
+                <Button type='submit' variant="contained">{!isEdit ? 'Save' : 'Edit'} {loading && <CircularProgress/>}</Button>
                 <Button variant="contained" component={NavLink} to='/'>Back to contacts</Button>
             </Grid>
         </form>

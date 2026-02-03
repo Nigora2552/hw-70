@@ -1,6 +1,7 @@
 import type {IContact, IContactAPI, IContactMutation} from "../../types";
 import {createAsyncThunk, createSlice, type PayloadAction} from "@reduxjs/toolkit";
 import axiosApi from "../../axiosApi.ts";
+import type {AppDispatch} from "../store.ts";
 
 interface ContactSlice {
     contacts: IContact[] | null;
@@ -11,7 +12,7 @@ interface ContactSlice {
 
 const initialState: ContactSlice = {
     contacts: [],
-    item:undefined,
+    item: undefined,
     oneContact: null,
     loading: false,
 }
@@ -20,13 +21,13 @@ export const contactSlice = createSlice({
     name: 'contact',
     initialState,
     reducers: {
-        getContact: (state, action:PayloadAction<IContact | undefined>) => {
+        getContact: (state, action: PayloadAction<IContact | undefined>) => {
             const onePerson = action.payload;
 
-                if (onePerson) {
-                    state.item = onePerson
+            if (onePerson) {
+                state.item = onePerson
             }
-        }
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(fetchContact.pending, (state) => {
@@ -62,13 +63,23 @@ export const contactSlice = createSlice({
             state.loading = false;
         });
 
-        builder.addCase(createContact.pending, (state) => {
+        builder.addCase(addContact.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(createContact.fulfilled, (state) => {
+        builder.addCase(addContact.fulfilled, (state) => {
             state.loading = false;
         });
-        builder.addCase(createContact.rejected, (state) => {
+        builder.addCase(addContact.rejected, (state) => {
+            state.loading = false;
+        })
+
+        builder.addCase(removeContact.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(removeContact.fulfilled, (state) => {
+            state.loading = false;
+        });
+        builder.addCase(removeContact.rejected, (state) => {
             state.loading = false;
         })
     }
@@ -92,20 +103,25 @@ export const fetchContact = createAsyncThunk<IContact[], void>('contact/fetchCon
 
 export const getOneContact = createAsyncThunk<IContactMutation | null, string>('contact/getOneContact',
     async (id) => {
-        const response = await axiosApi.get<IContactMutation | null>(`contacts${id}.json`);
+        const response = await axiosApi.get<IContactMutation | null>(`contacts/${id}.json`);
         return response.data;
+
     });
 
 export const editContact = createAsyncThunk<void, { id: string; item: IContactMutation }>('contacts/editContact',
     async ({id, item}) => {
-        await axiosApi.put<IContactMutation | null>(`contacts${id}.json`, item);
-    })
+        await axiosApi.put<IContactMutation | null>(`contacts/${id}.json`, item);
+    });
 
-export const createContact = createAsyncThunk<void, IContactMutation>('contact/createContact',
+export const addContact = createAsyncThunk<void, IContactMutation>('contact/addContact',
     async (item) => {
         await axiosApi.post('contacts.json', item);
-    })
-
+    });
+export const removeContact = createAsyncThunk<void, string, {dispatch: AppDispatch}>('contact/removeContact',
+    async (id, thunkAPI) => {
+        await axiosApi.delete<IContactMutation | null>(`contacts/${id}.json`);
+        await thunkAPI.dispatch(fetchContact())
+    });
 
 export const {getContact} = contactSlice.actions;
 export const contactsReducer = contactSlice.reducer;
