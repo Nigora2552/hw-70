@@ -6,7 +6,7 @@ import {Button, CircularProgress, Paper} from "@mui/material";
 import PersonCard from "../../components/PersonCard/PersonCard.tsx";
 import Modal from "../../components/UI/Modal/Modal.tsx";
 import type {IContact} from "../../types";
-import {NavLink, useNavigate} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import AddIcCallIcon from '@mui/icons-material/AddIcCall';
 import MarkunreadIcon from '@mui/icons-material/Markunread';
 import {toast} from "react-toastify";
@@ -19,7 +19,6 @@ const Home = () => {
     const item = useAppSelector(selectOneContact)
     const [showModal, setShowModal] = useState(false);
 
-    // const navigate = useNavigate();
 
     const get = (onePerson: IContact) => {
         setShowModal(true);
